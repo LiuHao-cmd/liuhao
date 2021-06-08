@@ -7,12 +7,41 @@
     <groupId>com.liuhao.blog</groupId>
     <artifactId>liuhao.blog</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <name>刘浩的博客</name>
+    <!--项目的组织-->
+    <organization>
+        <name>liuhao</name>
+        <url>http://www.liuhao.com</url>
+    </organization>
+    <!--将packaging指定为war,默认为jar-->
+    <packaging>war</packaging>
+    <!--指定版本-->
+    <properties>
+        <version.jdk>1.8</version.jdk>
+        <version.maven-surefire-plugin>2.4.2</version.maven-surefire-plugin>
+        <version.maven-compiler-plugin>3.1</version.maven-compiler-plugin>
+        <version.maven-install-plugin>2.5.1</version.maven-install-plugin>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <version.maven-war-plugin>3.1.0</version.maven-war-plugin>
+    </properties>
     <dependencies>
         <!--web模块-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <version>2.3.1.RELEASE</version>
+            <exclusions>
+                <!--降低json版本,避免tomcat8.x版本报不兼容错误-->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-json</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-json</artifactId>
+            <version>2.0.4.RELEASE</version>
         </dependency>
         <!--自动装配-->
         <dependency>
@@ -20,6 +49,80 @@
             <artifactId>spring-boot-autoconfigure</artifactId>
             <version>2.3.1.RELEASE</version>
         </dependency>
+        <!--打包war移除内嵌的Tomcat-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <version>2.3.1.RELEASE</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--打包war添加servlet的依赖-->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
-    
+        <!--应用程序打成war包-->
+        <build>
+            <finalName>${project.artifactId}</finalName>
+            <plugins>
+                <!--忽略Junit代码-->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${version.maven-surefire-plugin}</version>
+                    <configuration>
+                        <skipTests>true</skipTests>
+                    </configuration>
+                </plugin>
+                <!--将应用打包成war包-->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${version.maven-compiler-plugin}</version>
+                    <configuration>
+                        <source>${version.jdk}</source>
+                        <target>${version.jdk}</target>
+                        <showWarnings>true</showWarnings>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                    </configuration>
+                </plugin>
+                <!--安装你指定的文件到本地仓库,这里忽略-->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>${version.maven-install-plugin}</version>
+                    <configuration>
+                        <skip>true</skip>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>${version.maven-war-plugin}</version>
+                </plugin>
+            </plugins>
+            <resources>
+                <resource>
+                    <directory>src/main/resources</directory>
+                    <includes>
+                        <!--打包resources目录下所有文件-->
+                        <include>**/*.*</include>
+                    </includes>
+                    <excludes>
+                        <!--过滤xml文件-->
+                        <exclude>${project.basedir}/src/main/resource/version/*.xml</exclude>
+                    </excludes>
+                </resource>
+                <resource>
+                    <directory>src/main/java</directory>
+                    <includes>
+                        <!--打包java目录下的xml文件-->
+                        <include>**/*.xml</include>
+                    </includes>
+                </resource>
+            </resources>
+        </build>
 </project>
