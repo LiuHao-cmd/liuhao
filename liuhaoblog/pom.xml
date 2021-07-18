@@ -54,7 +54,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
             <version>2.3.1.RELEASE</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <!--打包war添加servlet的依赖-->
         <dependency>
